@@ -25,11 +25,30 @@ export class ArtworksComponent implements OnInit {
       });
   }
 
+  getArtworksByArtist(artistId) {
+    const href = `https://api.artsy.net:443/api/artworks?&artist_id=${artistId}`;
+    this.dataService.getFromApi(href)
+      .then((data) => {
+        Promise.all(this.getArtistNameAndHref(data._embedded.artworks))
+          .then((artworks) => { this._artworks = this.filterArtworks(artworks) });
+      })
+  }
+
+  getSimilarArtworks(href) {
+    this.dataService.getFromApi(href)
+      .then((data) => {
+        Promise.all(this.getArtistNameAndHref(data._embedded.artworks))
+          .then((artworks) => { this._artworks = this.filterArtworks(artworks) });
+      })
+  }
+
   filterArtworks(artworks) {
     return artworks.filter((artwork) => {
       let hasSmallImage = false;
-      for (let image of artwork.image_versions) {
-        if (image === 'small') hasSmallImage = true;
+      if (artwork.image_versions) {
+        for (let image of artwork.image_versions) {
+          if (image === 'small') hasSmallImage = true;
+        }
       }
       return hasSmallImage;
     });
@@ -41,9 +60,9 @@ export class ArtworksComponent implements OnInit {
         this.dataService.getFromApi(artwork._links.artists.href)
           .then((data) => {
             let artist = data._embedded.artists[0];
-            if (artist) {
+            if (artist && artist.name) {
               artwork.artistName = artist.name;
-              artwork.artistHref = artist._links.permalink.href;
+              artwork.artistId = artist.id;
             }
             resolve(artwork);
         })
@@ -51,16 +70,8 @@ export class ArtworksComponent implements OnInit {
     });
   }
 
-  getFormattedUrl(article) {
+  getFormattedImageUrl(article) {
     return article._links.image.href.replace(/{image_version}/i, 'small');
-  }
-
-  getSimilarArtworks(href) {
-    this.dataService.getFromApi(href)
-      .then((data) => {
-        Promise.all(this.getArtistNameAndHref(data._embedded.artworks))
-          .then((artworks) => { this._artworks = this.filterArtworks(artworks) });
-      })
   }
 
 }

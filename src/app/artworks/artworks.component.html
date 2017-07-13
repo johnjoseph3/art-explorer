@@ -7,9 +7,9 @@
         target="_blank">
           {{artwork.title}}
         </a></h3>
-      <a href={{artwork.artistHref}} *ngIf="artwork.artistHref" target="_blank">{{artwork.artistName}}</a><br>
+      <p class="link" (click)="getArtworksByArtist(artwork.artistId)" *ngIf="artwork.artistName">{{artwork.artistName}}</p>
       <p class="link" (click)="getSimilarArtworks(artwork._links.similar_artworks.href)">Simlilar Works</p>
     </div>
-    <img src="{{getFormattedUrl(artwork)}}">
+    <img src="{{getFormattedImageUrl(artwork)}}">
   </masonry-brick>
 </masonry> 
