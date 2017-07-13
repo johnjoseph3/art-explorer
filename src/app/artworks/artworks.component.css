@@ -16,3 +16,10 @@
   display: block;
   color: white;
 }
+
+.genes {
+  background-color: white;
+  color: black;
+  z-index: 100;
+  position: absolute;
+}

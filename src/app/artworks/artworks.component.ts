@@ -20,25 +20,52 @@ export class ArtworksComponent implements OnInit {
         this.dataService.getArtworks()
           .then((artworks) => {
             Promise.all(this.getArtistNameAndHref(artworks))
-              .then((artworks) => { this._artworks = this.filterArtworks(artworks) });
+              .then((artworks) => { 
+                Promise.all(this.getGeneNames(artworks))
+                  .then((artworks) => {
+                    this._artworks = this.filterArtworks(artworks)
+                  })
+              });
           })
-      });
+        });
   }
 
-  getArtworksByArtist(artistId) {
-    const href = `https://api.artsy.net:443/api/artworks?&artist_id=${artistId}`;
+  getArtworksById(id, type) {
+    const href = `https://api.artsy.net:443/api/artworks?&${type}_id=${id}`;
     this.dataService.getFromApi(href)
       .then((data) => {
         Promise.all(this.getArtistNameAndHref(data._embedded.artworks))
-          .then((artworks) => { this._artworks = this.filterArtworks(artworks) });
+          .then((artworks) => {
+            Promise.all(this.getGeneNames(artworks))
+              .then((artworks) => {
+                this._artworks = this.filterArtworks(artworks)
+              })
+           });
       })
+  }
+
+  getGeneNames(artworks) {
+    return artworks.map((artwork) => {
+      return new Promise((resolve, reject) => {
+        this.dataService.getFromApi(artwork._links.genes.href)
+          .then((data) => {
+            artwork.genes = data._embedded.genes;
+            resolve(artwork);
+        })
+      })
+    });
   }
 
   getSimilarArtworks(href) {
     this.dataService.getFromApi(href)
       .then((data) => {
         Promise.all(this.getArtistNameAndHref(data._embedded.artworks))
-          .then((artworks) => { this._artworks = this.filterArtworks(artworks) });
+          .then((artworks) => { 
+            Promise.all(this.getGeneNames(artworks))
+              .then((artworks) => {
+                this._artworks = this.filterArtworks(artworks)
+              })
+          });
       })
   }
 

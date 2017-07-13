@@ -7,8 +7,12 @@
         target="_blank">
           {{artwork.title}}
         </a></h3>
-      <p class="link" (click)="getArtworksByArtist(artwork.artistId)" *ngIf="artwork.artistName">{{artwork.artistName}}</p>
+      <p class="link" (click)="getArtworksById(artwork.artistId, 'artist')" *ngIf="artwork.artistName">{{artwork.artistName}}</p>
       <p class="link" (click)="getSimilarArtworks(artwork._links.similar_artworks.href)">Simlilar Works</p>
+      <p class="link" (click)="showGenes ? showGenes = false : showGenes = true;">Genes</p>
+      <div *ngIf="showGenes" class="genes">
+        <p class="link" *ngFor="let gene of artwork.genes" (click)="getArtworksById(gene.id, 'gene')">{{gene.name}}</p>
+      </div>
     </div>
     <img src="{{getFormattedImageUrl(artwork)}}">
   </masonry-brick>
